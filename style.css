@@ -1,0 +1,78 @@
+
+:root {
+  --bg: #fff7fb;
+  --text: #1f2430;
+  --glass: rgba(255,255,255,0.35);
+  --glass-strong: rgba(255,255,255,0.45);
+  --border: rgba(255,255,255,0.75);
+  --accent: #ff5fa2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--text);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,180,220,.45), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(170,220,255,.30), transparent 45%),
+    linear-gradient(180deg,#fff7fb,#ffeaf4);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 25% 25%, rgba(255,255,255,.55), transparent 20%),
+    radial-gradient(circle at 75% 60%, rgba(255,255,255,.35), transparent 25%);
+  filter: blur(100px);
+}
+
+.nav,
+.hero-terminal,
+.project-card,
+.contact-card,
+.quote {
+  background: rgba(255,255,255,0.35);
+  border: 2px solid rgba(255,255,255,0.9);
+  border-radius: 32px;
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  box-shadow:
+    0 12px 40px rgba(255,158,199,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    inset 0 -1px 0 rgba(255,255,255,0.35);
+}
+
+.nav {
+  border-radius: 999px;
+}
+
+.project-card:hover,
+.contact-card:hover,
+.hero-terminal:hover {
+  transform: translateY(-6px);
+  transition: all .25s ease;
+}
+
+.avatar {
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,.95);
+}
+
+.chip {
+  background: rgba(255,255,255,0.35);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-radius: 999px;
+}
