@@ -498,8 +498,8 @@ img, svg { display: block; max-width: 100%; }
 }
 
 .contact-card {
-  background: rgba(255,255,255,0.42);
-  border: 1px solid rgba(255,255,255,0.55);
+  background: rgb(255, 254, 255);
+  border: 1px solid rgb(255, 255, 255);
   border-radius: 16px;
   padding: 20px;
   transition: all 0.2s ease;
@@ -686,7 +686,9 @@ img, svg { display: block; max-width: 100%; }
             <p class="eyebrow">初级开发者</p>
             <h1>流年</h1>
             <p class="hero-lede">
-              你好呀，欢迎来到流年的小主页喵，希望你进来的时候，心情能变轻一些些呀，希望在这里你能看到一个真实的我，也希望我的经历和想法能对你有所帮助，或者让你觉得温暖一些些喵
+              你好呀，欢迎来到流年的小主页喵，希望你进来的时候，心情能变轻一些些呀，
+              希望在这里你能看到一个真实的我，也希望我的经历和想法能对你有所帮助，
+              或者让你觉得温暖一些些
             </p>
             <div class="hero-actions">
               <a href="#contact" class="btn btn-primary">联系我</a>
@@ -722,9 +724,6 @@ img, svg { display: block; max-width: 100%; }
         正式以女生身份真实生活，目前是一名高中生，抑郁，性别焦虑(性别不清)，ADHD注意力缺陷障碍，失眠，精神状态还算稳定，休学中（准备复学中），
         喜欢可可爱爱的事物，也喜欢 C++、SQLite 与 Web 前后端开发，
         除了技术之外，记录关于成长，性别认同，以及未来的思考与感悟
-      </p>
-      <p class="section-text">
-        目前正在学习 C++、SQLite 与 Web 前后端开发，未来希望能成为一名优秀的全栈开发工程师
       </p>
       <div class="chip-row">
       </div>
@@ -851,14 +850,14 @@ navLinks.querySelectorAll("a").forEach((link) => {
 const FALLBACK_PROJECTS = [
   {
     title: "流年的主页",
-    description:"流年个人主页项目喵，一个好看的静态网站",
+    description:"流年个人主页项目喵，一个好看的静态网站喵",
     tags: ["CSS，HTML，前端"],
     link: ""
   },
   {
-    title: "更多项目",
+    title: "更多项目喵",
     description:"更多项目正在开发中喵、、",
-    tags: ["开发ing..."],
+    tags: ["开发喵ing..."],
     link: ""
   }
 ];
@@ -926,6 +925,13 @@ async function loadProjects() {
 
 // No backend in this static preview — render the sample data directly.
 renderProjects(FALLBACK_PROJECTS, true);
+//
+{ /* Uncomment the line below to fetch projects from the API when backend is available */}
+{ /* loadProjects(); */
+
+
+}
+
 
 
 </script>
