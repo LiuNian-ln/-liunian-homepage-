@@ -3,16 +3,16 @@
   --bg2: #ffeaf4;
   --text: #1f2430;
 
-  --glass: rgba(255, 255, 255, 0.05);
-  --glass-hover: rgba(255, 255, 255, 0.42);
-  --glass-strong: rgba(255, 255, 255, 0.60);
+  --glass: rgba(255, 255, 255, 0.015);
+  --glass-hover: rgba(255, 255, 255, 0.08);
+  --glass-strong: rgba(255, 255, 255, 0.02);
 
-  --border: rgba(255, 255, 255, 0.50);
+  --border: rgba(255, 255, 255, 0.35);
   --shadow: rgba(255, 105, 180, 0.12);
   --accent: #ff5fa2;
 
   --glass-blur: 14px;
-  --glass-opacity: 0.05;
+  --glass-opacity: 0.015;
 }
 
 * {
@@ -69,7 +69,7 @@ body::after {
 .project-card,
 .contact-card,
 .quote {
-  background: var(--glass);
+  background: transparent;
   border-radius: 28px;
 
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(170%);
@@ -88,6 +88,17 @@ body::after {
 
   will-change: transform;
 }
+
+.nav,
+.hero-terminal {
+    background: var(--glass-strong);
+  }
+
+  .project-card,
+  .contact-card,
+  .quote {
+    background: var(--glass);
+  }
 
 .project-card:hover,
 .contact-card:hover,
@@ -202,16 +213,16 @@ button {
   letter-spacing: 0.4px;
   text-decoration: none;
 
-  color: rgba(25, 55, 105, 0.92);
+  color: rgba(15, 35, 80, 0.95);
 
   border-radius: 999px;
 
-  background: rgba(255, 194, 194, 0.909);
+  background: rgba(255, 255, 255, 0.55);
 
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(200%);
+  backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(200%);
 
-  border: 1px solid rgb(172, 208, 255);
+  border: 1px solid rgba(220, 235, 255, 1);
 
   overflow: hidden;
 
@@ -229,8 +240,8 @@ button {
   inset: 0;
 
   background:
-    radial-gradient(circle at 30% 20%, rgba(255, 193, 193, 0.898), transparent 55%),
-    radial-gradient(circle at 70% 80%, rgba(180, 220, 255, 0.982), transparent 60%);
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.55), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(180,220,255,0.18), transparent 60%);
 
   opacity: 0.6;
   pointer-events: none;
@@ -248,7 +259,7 @@ button {
   height: 5px;
   border-radius: 999px;
 
-  background: rgba(255, 203, 203, 0.9);
+  background: rgba(255,255,255,0.92);
   opacity: 0.7;
   pointer-events: none;
 }
@@ -265,7 +276,7 @@ button {
 .aqua:hover {
   transform: translateY(-8px) scale(1.02);
 
-  background: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.68);
   border-color: rgb(196, 216, 255);
 
   box-shadow:
@@ -281,6 +292,28 @@ button {
   box-shadow:
     0 12px 30px rgba(60, 120, 200, 0.18),
     inset 0 2px 6px rgba(0,0,0,0.08);
-    backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(200%);
 }
-  
+
+
+/* About section alignment - match other sections */
+#about {
+  text-align: left;
+}
+
+#about .section-text,
+#about .section-text--narrow {
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+#about .chip-row {
+  justify-content: flex-start;
+}
+hr.section-inner {
+  border: none;
+  background: transparent;
+  opacity: 0;
+  height: 0;
+  margin: 0;
+}
