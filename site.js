@@ -105,6 +105,21 @@ async function loadProjects() {
 
 loadProjects();
 
+// ---------- Animated pet ----------
+const petSprite = document.querySelector("[data-pet-sprite]");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+if (petSprite && !reduceMotion) {
+  const idleFrames = 6;
+  let frame = 0;
+  petSprite.classList.add("is-floating");
+
+  window.setInterval(() => {
+    petSprite.style.backgroundPosition = `${(frame / 7) * 100}% 0%`;
+    frame = (frame + 1) % idleFrames;
+  }, 220);
+}
+
 // ---------- Contact form ----------
 const contactForm = document.getElementById("contact-form");
 const contactStatus = document.getElementById("cf-status");
