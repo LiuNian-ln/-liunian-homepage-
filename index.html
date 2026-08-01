@@ -492,7 +492,7 @@ img, svg { display: block; max-width: 100%; }
   z-index: 1;
   width: min(46vw, 188px);
   aspect-ratio: 192 / 208;
-  background-image: url("eyjafjalla-spritesheet.webp");
+  background-image: url("assets/eyjafjalla-spritesheet-optimized.webp");
   background-repeat: no-repeat;
   background-size: 800% 1100%;
   background-position: 0% 0%;
@@ -813,29 +813,32 @@ html { background: #f3aaa7; }
 body {
   min-height: 100vh;
   color: #514a50;
-  background: #f3aaa7 var(--page-art) center / cover fixed no-repeat;
+  background: #f3aaa7;
 }
-body::before { z-index: 0; background: linear-gradient(180deg, rgba(255,226,220,.06), rgba(237,143,158,.08)); filter: none; opacity: 1; }
+body::before {
+  content: ""; position: fixed; z-index: 0; inset: 0; pointer-events: none;
+  background: var(--page-art) center / cover no-repeat;
+  transform: translateZ(0);
+}
 body::after { z-index: 0; }
 .page-shell { position: relative; z-index: 1; padding: clamp(148px, 18vh, 190px) 24px 48px; }
 .liquid-card {
   --glass-local-x: 50%; --glass-local-y: 18%; --glass-local-shift-x: 0px; --glass-local-shift-y: 0px;
-  position: relative; isolation: isolate; width: min(1080px, 100%); margin: 0 auto; overflow: hidden; border: 1px solid rgba(255,255,255,.76); border-radius: 30px;
+  position: relative; isolation: isolate; contain: paint; width: min(1080px, 100%); margin: 0 auto; overflow: hidden; border: 1px solid rgba(255,255,255,.76); border-radius: 30px;
   background: radial-gradient(ellipse 52% 34% at var(--glass-local-x) var(--glass-local-y), rgba(255,255,255,.25), transparent 72%), linear-gradient(132deg, rgba(255,248,245,.25), rgba(255,220,220,.17) 51%, rgba(247,204,218,.21));
   box-shadow: 0 34px 100px rgba(105,59,74,.14), 0 8px 28px rgba(255,255,255,.10), inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(138,70,94,.15), inset 7px 0 12px rgba(186,222,255,.12), inset -7px 0 12px rgba(255,188,210,.13), inset 0 0 0 1px rgba(255,255,255,.22);
-  -webkit-backdrop-filter: blur(1.6px) saturate(117%) brightness(1.03); backdrop-filter: blur(1.6px) saturate(117%) brightness(1.03);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
   transition: transform .28s ease, box-shadow .36s ease;
 }
 .liquid-card::before {
   content: ""; position: absolute; z-index: 0; inset: 0; pointer-events: none;
   background: linear-gradient(112deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.09) 18%, transparent 43%), radial-gradient(ellipse 45% 32% at var(--glass-local-x) var(--glass-local-y), rgba(255,255,255,.19), transparent 72%);
-  opacity: .84; mix-blend-mode: soft-light;
+  opacity: .52;
 }
 .liquid-card::after {
   content: ""; position: absolute; z-index: 0; inset: -6px; padding: 10px; pointer-events: none; border-radius: inherit;
-  background: var(--page-art) center / cover fixed no-repeat;
-  background-position: center; background-blend-mode: soft-light; opacity: .36; filter: url("#liquid-edge-refract") saturate(132%) contrast(110%); transform: scale(1.032) translate3d(var(--glass-local-shift-x), var(--glass-local-shift-y), 0);
-  -webkit-backdrop-filter: blur(.4px) saturate(134%); backdrop-filter: blur(.4px) saturate(134%);
+  background: conic-gradient(from 205deg at 50% 50%, rgba(196,226,255,.38), rgba(255,255,255,.78) 12%, rgba(255,191,215,.35) 26%, rgba(255,255,255,.18) 48%, rgba(255,244,225,.55) 70%, rgba(196,226,255,.38));
+  opacity: .72;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
 }
 .liquid-card > * { position: relative; z-index: 1; }
@@ -848,23 +851,27 @@ body::after { z-index: 0; }
 .floating-nav .nav-logo { color: #fff; text-shadow: 0 1px 8px rgba(133,60,81,.25); }
 .floating-nav .nav-links a { color: #625b61; }
 .floating-nav .nav-links a:hover { color: #ed4e82; }
-.floating-nav .aqua { color: #514a50; }
+.floating-nav .aqua { color: #514a50; -webkit-backdrop-filter: none; backdrop-filter: none; }
 .liquid-card .hero { padding-top: 84px; }
 .liquid-card .hero-terminal, .liquid-card .project-card, .liquid-card .contact-card, .liquid-card .quote, .guestbook-form, .message-stream { background: linear-gradient(135deg, rgba(255,250,249,.18), rgba(255,223,226,.11)); border-color: rgba(255,255,255,.62); box-shadow: inset 0 1px 0 rgba(255,255,255,.78), inset 0 0 0 1px rgba(255,255,255,.12), 0 16px 40px rgba(112,61,75,.06); -webkit-backdrop-filter: blur(1.2px) saturate(115%); backdrop-filter: blur(1.2px) saturate(115%); }
 .liquid-card .section, .liquid-card .footer { border-color: rgba(255,255,255,.54); }
 .liquid-card .section { background: rgba(255,232,230,.035); }
+.liquid-card .section { content-visibility: auto; contain-intrinsic-size: auto 440px; }
+.liquid-card :is(.aqua, .hero-terminal, .quote, .project-card, .pet-stage, .pet-copy, .contact-card, .guestbook-form, .message-stream) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.pet-sprite.is-floating { will-change: transform; }
 @media (max-width: 860px) {
   /* Portrait artwork is composed for a phone viewport; leave the desktop scene untouched. */
   :root { --page-art: url("assets/pastel-homepage-background-mobile.webp"); }
   body {
-    background-position: center top;
-    background-size: cover;
-    background-attachment: fixed;
+    background-attachment: scroll;
   }
   .page-shell { padding: 100px 16px 32px; }
   .liquid-card { border-radius: 25px; }
-  .floating-nav { top: 14px; width: calc(100% - 32px); }
-  .floating-nav .nav-links { background: rgba(255,240,240,.35); border-radius: 0 0 20px 20px; -webkit-backdrop-filter: blur(2px) saturate(115%); backdrop-filter: blur(2px) saturate(115%); }
+  .floating-nav { top: 14px; width: calc(100% - 32px); overflow: visible; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .floating-nav .nav-links { background: rgba(255,240,240,.35); border-radius: 0 0 20px 20px; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .liquid-card .hero { padding-top: 82px; }
 }
 
@@ -931,13 +938,6 @@ body::after { z-index: 0; }
 </head>
 <body>
 
-<svg class="liquid-filter-definitions" aria-hidden="true" width="0" height="0" focusable="false">
-  <filter id="liquid-edge-refract" x="-8%" y="-8%" width="116%" height="116%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.16" numOctaves="1" seed="8" result="edgeNoise"/>
-    <feDisplacementMap in="SourceGraphic" in2="edgeNoise" scale="16" xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
-</svg>
-
 <header class="nav floating-nav" id="nav">
   <div class="nav-inner">
     <a class="nav-logo" aria-label="Liunian home">流年</a>
@@ -963,9 +963,13 @@ body::after { z-index: 0; }
       <div class="hero-text">
         <div class="hero-profile">
           <img
-            src="avatar.jpg"
+            src="assets/avatar.webp"
             alt="流年头像"
             class="avatar"
+            width="180"
+            height="180"
+            decoding="async"
+            fetchpriority="high"
           />
 
           <div class="hero-info">
@@ -1275,9 +1279,10 @@ const petSprite = document.querySelector("[data-pet-sprite]");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- Liquid glass light and refraction ----------
-const liquidSurfaces = document.querySelectorAll(".liquid-card, .floating-nav");
+const liquidSurfaces = document.querySelectorAll(".floating-nav");
+const precisePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-if (!reduceMotion && liquidSurfaces.length) {
+if (!reduceMotion && precisePointer && liquidSurfaces.length) {
   let pendingLightFrame = null;
   let pointerX = window.innerWidth * 0.5;
   let pointerY = window.innerHeight * 0.18;
@@ -1306,20 +1311,41 @@ if (!reduceMotion && liquidSurfaces.length) {
     pointerY = event.clientY;
     requestLiquidLight();
   }, { passive: true });
-  window.addEventListener("scroll", requestLiquidLight, { passive: true });
-  window.addEventListener("resize", requestLiquidLight, { passive: true });
   requestLiquidLight();
 }
 
 if (petSprite && !reduceMotion) {
   const idleFrames = 6;
   let frame = 0;
-  petSprite.classList.add("is-floating");
+  let petTimer = null;
+  let petIsVisible = false;
 
-  window.setInterval(() => {
-    petSprite.style.backgroundPosition = `${(frame / 7) * 100}% 0%`;
-    frame = (frame + 1) % idleFrames;
-  }, 220);
+  const stopPet = () => {
+    if (petTimer !== null) window.clearInterval(petTimer);
+    petTimer = null;
+    petSprite.classList.remove("is-floating");
+  };
+
+  const startPet = () => {
+    if (!petIsVisible || document.hidden || petTimer !== null) return;
+    petSprite.classList.add("is-floating");
+    petTimer = window.setInterval(() => {
+      petSprite.style.backgroundPosition = `${(frame / 7) * 100}% 0%`;
+      frame = (frame + 1) % idleFrames;
+    }, 220);
+  };
+
+  const petObserver = new IntersectionObserver(([entry]) => {
+    petIsVisible = entry.isIntersecting;
+    if (petIsVisible) startPet();
+    else stopPet();
+  }, { rootMargin: "160px 0px" });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopPet();
+    else startPet();
+  });
+  petObserver.observe(petSprite);
 }
 
 </script>
