@@ -802,49 +802,69 @@ img, svg { display: block; max-width: 100%; }
 }
 
 /* Full-page artwork with the existing homepage kept inside one liquid-glass card. */
+:root {
+  --page-art: url("assets/pastel-homepage-background.webp");
+  --glass-light-x: 50%;
+  --glass-light-y: 18%;
+  --glass-shift-x: 0px;
+  --glass-shift-y: 0px;
+}
 html { background: #f3aaa7; }
 body {
   min-height: 100vh;
   color: #514a50;
-  background: #f3aaa7 url("assets/pastel-homepage-background.webp") center / cover fixed no-repeat;
+  background: #f3aaa7 var(--page-art) center / cover fixed no-repeat;
 }
-body::before { z-index: 0; background: linear-gradient(180deg, rgba(255,226,220,.10), rgba(237,143,158,.12)); filter: none; opacity: 1; }
+body::before { z-index: 0; background: linear-gradient(180deg, rgba(255,226,220,.06), rgba(237,143,158,.08)); filter: none; opacity: 1; }
 body::after { z-index: 0; }
 .page-shell { position: relative; z-index: 1; padding: clamp(148px, 18vh, 190px) 24px 48px; }
 .liquid-card {
-  position: relative; width: min(1080px, 100%); margin: 0 auto; overflow: hidden; border: 1px solid rgba(255,255,255,.82); border-radius: 28px;
-  background: radial-gradient(circle at 16% 5%, rgba(255,255,255,.36), transparent 31%), linear-gradient(135deg, rgba(255,247,244,.24), rgba(255,222,218,.20));
-  box-shadow: 0 30px 90px rgba(111,55,70,.18), inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(173,82,109,.14);
-  -webkit-backdrop-filter: blur(2px) saturate(108%); backdrop-filter: blur(2px) saturate(108%);
+  --glass-local-x: 50%; --glass-local-y: 18%; --glass-local-shift-x: 0px; --glass-local-shift-y: 0px;
+  position: relative; isolation: isolate; width: min(1080px, 100%); margin: 0 auto; overflow: hidden; border: 1px solid rgba(255,255,255,.76); border-radius: 30px;
+  background: radial-gradient(ellipse 52% 34% at var(--glass-local-x) var(--glass-local-y), rgba(255,255,255,.25), transparent 72%), linear-gradient(132deg, rgba(255,248,245,.25), rgba(255,220,220,.17) 51%, rgba(247,204,218,.21));
+  box-shadow: 0 34px 100px rgba(105,59,74,.14), 0 8px 28px rgba(255,255,255,.10), inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(138,70,94,.15), inset 7px 0 12px rgba(186,222,255,.12), inset -7px 0 12px rgba(255,188,210,.13), inset 0 0 0 1px rgba(255,255,255,.22);
+  -webkit-backdrop-filter: blur(1.6px) saturate(117%) brightness(1.03); backdrop-filter: blur(1.6px) saturate(117%) brightness(1.03);
+  transition: transform .28s ease, box-shadow .36s ease;
 }
 .liquid-card::before {
   content: ""; position: absolute; z-index: 0; inset: 0; pointer-events: none;
-  background: linear-gradient(114deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.05) 25%, transparent 49%), radial-gradient(ellipse at 77% 38%, rgba(255,255,255,.12), transparent 37%);
+  background: linear-gradient(112deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.09) 18%, transparent 43%), radial-gradient(ellipse 45% 32% at var(--glass-local-x) var(--glass-local-y), rgba(255,255,255,.19), transparent 72%);
+  opacity: .84; mix-blend-mode: soft-light;
+}
+.liquid-card::after {
+  content: ""; position: absolute; z-index: 0; inset: -6px; padding: 10px; pointer-events: none; border-radius: inherit;
+  background: var(--page-art) center / cover fixed no-repeat;
+  background-position: center; background-blend-mode: soft-light; opacity: .36; filter: url("#liquid-edge-refract") saturate(132%) contrast(110%); transform: scale(1.032) translate3d(var(--glass-local-shift-x), var(--glass-local-shift-y), 0);
+  -webkit-backdrop-filter: blur(.4px) saturate(134%); backdrop-filter: blur(.4px) saturate(134%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
 }
 .liquid-card > * { position: relative; z-index: 1; }
+.liquid-card:active { transform: scale(.998); }
 .liquid-card .hero::before { display: none; }
-.floating-nav { position: fixed; top: 25px; left: 50%; z-index: 100; width: min(1160px, calc(100% - 48px)); transform: translateX(-50%); margin: 0; padding: 0; background: rgba(255,241,241,.32); border-color: rgba(255,255,255,.84); box-shadow: 0 12px 35px rgba(143,72,89,.14), inset 0 1px 0 rgba(255,255,255,.9); }
+.floating-nav { position: fixed; isolation: isolate; overflow: hidden; top: 25px; left: 50%; z-index: 100; width: min(1160px, calc(100% - 48px)); transform: translateX(-50%); margin: 0; padding: 0; border-color: rgba(255,255,255,.82); background: radial-gradient(ellipse 42% 150% at var(--glass-local-x, 50%) var(--glass-local-y, 18%), rgba(255,255,255,.31), transparent 70%), linear-gradient(110deg, rgba(255,249,246,.30), rgba(255,220,221,.20)); box-shadow: 0 18px 55px rgba(115,62,79,.12), inset 0 1px 0 rgba(255,255,255,.94), inset 0 -1px 0 rgba(132,69,90,.13), inset 0 0 0 1px rgba(255,255,255,.20); -webkit-backdrop-filter: blur(1.6px) saturate(119%) brightness(1.04); backdrop-filter: blur(1.6px) saturate(119%) brightness(1.04); transition: box-shadow .3s ease, transform .28s ease; }
+.floating-nav::before { content: ""; position: absolute; z-index: -1; inset: 1px; pointer-events: none; border-radius: inherit; background: linear-gradient(108deg, rgba(255,255,255,.35), transparent 36%), radial-gradient(ellipse 30% 180% at var(--glass-local-x, 50%) var(--glass-local-y, 18%), rgba(255,255,255,.23), transparent 75%); mix-blend-mode: soft-light; }
+.floating-nav::after { content: ""; position: absolute; z-index: -1; inset: 3px; pointer-events: none; border: 1px solid rgba(255,255,255,.36); border-radius: inherit; box-shadow: inset 0 1px 2px rgba(255,255,255,.30); }
 .floating-nav .nav-inner { height: 64px; }
 .floating-nav .nav-logo { color: #fff; text-shadow: 0 1px 8px rgba(133,60,81,.25); }
 .floating-nav .nav-links a { color: #625b61; }
 .floating-nav .nav-links a:hover { color: #ed4e82; }
 .floating-nav .aqua { color: #514a50; }
 .liquid-card .hero { padding-top: 84px; }
-.liquid-card .hero-terminal, .liquid-card .project-card, .liquid-card .contact-card, .liquid-card .quote { background: rgba(255,246,247,.22); }
-.liquid-card .section, .liquid-card .footer { border-color: rgba(255,255,255,.60); }
-.liquid-card .section { background: rgba(255,232,230,.08); }
+.liquid-card .hero-terminal, .liquid-card .project-card, .liquid-card .contact-card, .liquid-card .quote, .guestbook-form, .message-stream { background: linear-gradient(135deg, rgba(255,250,249,.18), rgba(255,223,226,.11)); border-color: rgba(255,255,255,.62); box-shadow: inset 0 1px 0 rgba(255,255,255,.78), inset 0 0 0 1px rgba(255,255,255,.12), 0 16px 40px rgba(112,61,75,.06); -webkit-backdrop-filter: blur(1.2px) saturate(115%); backdrop-filter: blur(1.2px) saturate(115%); }
+.liquid-card .section, .liquid-card .footer { border-color: rgba(255,255,255,.54); }
+.liquid-card .section { background: rgba(255,232,230,.035); }
 @media (max-width: 860px) {
   /* Portrait artwork is composed for a phone viewport; leave the desktop scene untouched. */
+  :root { --page-art: url("assets/pastel-homepage-background-mobile.webp"); }
   body {
-    background-image: url("assets/pastel-homepage-background-mobile.webp");
     background-position: center top;
     background-size: cover;
     background-attachment: fixed;
   }
   .page-shell { padding: 100px 16px 32px; }
-  .liquid-card { border-radius: 23px; }
+  .liquid-card { border-radius: 25px; }
   .floating-nav { top: 14px; width: calc(100% - 32px); }
-  .floating-nav .nav-links { background: rgba(255,240,240,.82); border-radius: 0 0 20px 20px; }
+  .floating-nav .nav-links { background: rgba(255,240,240,.35); border-radius: 0 0 20px 20px; -webkit-backdrop-filter: blur(2px) saturate(115%); backdrop-filter: blur(2px) saturate(115%); }
   .liquid-card .hero { padding-top: 82px; }
 }
 
@@ -902,10 +922,21 @@ body::after { z-index: 0; }
 .message-time { color: #917d87; font-size: .72rem; }
 .message-text { margin: 0; color: #5f535c; font-size: .9rem; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
 @media (max-width: 860px) { .guestbook-layout { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  .liquid-card, .floating-nav { transition: none; }
+  .liquid-card:active { transform: none; }
+}
 
 </style>
 </head>
 <body>
+
+<svg class="liquid-filter-definitions" aria-hidden="true" width="0" height="0" focusable="false">
+  <filter id="liquid-edge-refract" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.16" numOctaves="1" seed="8" result="edgeNoise"/>
+    <feDisplacementMap in="SourceGraphic" in2="edgeNoise" scale="16" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
 
 <header class="nav floating-nav" id="nav">
   <div class="nav-inner">
@@ -1242,6 +1273,43 @@ renderProjects(FALLBACK_PROJECTS, true);
 // ---------- Animated pet ----------
 const petSprite = document.querySelector("[data-pet-sprite]");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---------- Liquid glass light and refraction ----------
+const liquidSurfaces = document.querySelectorAll(".liquid-card, .floating-nav");
+
+if (!reduceMotion && liquidSurfaces.length) {
+  let pendingLightFrame = null;
+  let pointerX = window.innerWidth * 0.5;
+  let pointerY = window.innerHeight * 0.18;
+
+  const paintLiquidLight = () => {
+    pendingLightFrame = null;
+    liquidSurfaces.forEach((surface) => {
+      const bounds = surface.getBoundingClientRect();
+      const x = Math.max(0, Math.min(100, ((pointerX - bounds.left) / bounds.width) * 100));
+      const y = Math.max(0, Math.min(100, ((pointerY - bounds.top) / bounds.height) * 100));
+      const shiftX = ((x - 50) / 50) * 2.2;
+      const shiftY = ((y - 50) / 50) * 1.4;
+      surface.style.setProperty("--glass-local-x", `${x}%`);
+      surface.style.setProperty("--glass-local-y", `${y}%`);
+      surface.style.setProperty("--glass-local-shift-x", `${shiftX}px`);
+      surface.style.setProperty("--glass-local-shift-y", `${shiftY}px`);
+    });
+  };
+
+  const requestLiquidLight = () => {
+    if (pendingLightFrame === null) pendingLightFrame = requestAnimationFrame(paintLiquidLight);
+  };
+
+  window.addEventListener("pointermove", (event) => {
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    requestLiquidLight();
+  }, { passive: true });
+  window.addEventListener("scroll", requestLiquidLight, { passive: true });
+  window.addEventListener("resize", requestLiquidLight, { passive: true });
+  requestLiquidLight();
+}
 
 if (petSprite && !reduceMotion) {
   const idleFrames = 6;
