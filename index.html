@@ -814,6 +814,7 @@ body {
   min-height: 100vh;
   color: #514a50;
   background: #f3aaa7;
+  isolation: isolate;
 }
 body::before {
   content: ""; position: fixed; z-index: 0; inset: 0; pointer-events: none;
@@ -821,7 +822,19 @@ body::before {
   transform: translateZ(0);
 }
 body::after { z-index: 0; }
-.page-shell { position: relative; z-index: 1; padding: clamp(148px, 18vh, 190px) 24px 48px; }
+.page-shell { position: relative; z-index: 2; padding: clamp(148px, 18vh, 190px) 24px 48px; }
+#liquid-glass-webgl {
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  contain: strict;
+  transition: opacity .24s ease;
+}
+html.webgl-liquid-ready #liquid-glass-webgl { opacity: 1; }
 .liquid-card {
   --glass-local-x: 50%; --glass-local-y: 18%; --glass-local-shift-x: 0px; --glass-local-shift-y: 0px;
   position: relative; isolation: isolate; contain: paint; width: min(1080px, 100%); margin: 0 auto; overflow: hidden; border: 1px solid rgba(255,255,255,.76); border-radius: 30px;
@@ -861,6 +874,24 @@ body::after { z-index: 0; }
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+/* WebGL is progressive enhancement: these lighter layers reveal the sampled,
+   refracted artwork while the original CSS glass remains the fallback. */
+html.webgl-liquid-ready .liquid-card {
+  background:
+    radial-gradient(ellipse 52% 34% at var(--glass-local-x) var(--glass-local-y), rgba(255,255,255,.14), transparent 72%),
+    linear-gradient(132deg, rgba(255,248,245,.14), rgba(255,220,220,.08) 51%, rgba(247,204,218,.11));
+}
+html.webgl-liquid-ready .liquid-card::before { opacity: .30; }
+html.webgl-liquid-ready .liquid-card::after { opacity: .30; }
+html.webgl-liquid-ready .floating-nav {
+  background:
+    radial-gradient(ellipse 42% 150% at var(--glass-local-x, 50%) var(--glass-local-y, 18%), rgba(255,255,255,.17), transparent 70%),
+    linear-gradient(110deg, rgba(255,249,246,.17), rgba(255,220,221,.10));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html.webgl-liquid-ready .floating-nav::before { opacity: .42; }
+html.webgl-liquid-ready .floating-nav::after { border-color: rgba(255,255,255,.24); }
 .pet-sprite.is-floating { will-change: transform; }
 @media (max-width: 860px) {
   /* Portrait artwork is composed for a phone viewport; leave the desktop scene untouched. */
@@ -873,6 +904,7 @@ body::after { z-index: 0; }
   .floating-nav { top: 14px; width: calc(100% - 32px); overflow: visible; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .floating-nav .nav-links { background: rgba(255,240,240,.35); border-radius: 0 0 20px 20px; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .liquid-card .hero { padding-top: 82px; }
+  #liquid-glass-webgl { display: none; }
 }
 
 /* Contact cards: desktop layout only; preserve the original color and glass treatment. */
@@ -1307,6 +1339,10 @@ if (!reduceMotion && precisePointer && liquidSurfaces.length) {
   };
 
   window.addEventListener("pointermove", (event) => {
+    if (
+      document.documentElement.dataset.liquidGlass === "webgl" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) return;
     pointerX = event.clientX;
     pointerY = event.clientY;
     requestLiquidLight();
@@ -1349,6 +1385,7 @@ if (petSprite && !reduceMotion) {
 }
 
 </script>
+<script src="liquid-glass-webgl.js"></script>
 <script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.0/+esm";
 
