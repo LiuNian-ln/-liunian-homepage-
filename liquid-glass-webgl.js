@@ -34,7 +34,9 @@
       edge: 26,
       dispersion: 1.15,
       tint: 0.105,
-      highlight: 1.0
+      highlight: 1.0,
+      blurLod: 0.78,
+      bodyOpacity: 0.13
     },
     {
       element: document.querySelector(".floating-nav"),
@@ -43,7 +45,9 @@
       edge: 18,
       dispersion: 1.35,
       tint: 0.08,
-      highlight: 1.16
+      highlight: 1.16,
+      blurLod: 0.55,
+      bodyOpacity: 0.10
     }
   ].filter((surface) => surface.element);
 
@@ -93,6 +97,8 @@ uniform float uEdgeThickness;
 uniform float uDispersion;
 uniform float uTint;
 uniform float uHighlight;
+uniform float uBlurLod;
+uniform float uBodyOpacity;
 
 float roundedBoxSdf(vec2 point, vec2 halfSize, float radius) {
   vec2 q = abs(point) - halfSize + radius;
@@ -118,23 +124,25 @@ void main() {
   float innerDistance = max(-sdf, 0.0);
   float edge = 1.0 - smoothstep(0.0, uEdgeThickness, innerDistance);
   float effectAlpha = shapeAlpha * edge;
+  float bodyAlpha = shapeAlpha * uBodyOpacity;
+  float finalAlpha = max(effectAlpha, bodyAlpha);
 
-  // Redraw only the physical edge. The center remains transparent so the
-  // original full-resolution artwork stays sharp and most fragments exit
-  // before any texture sampling.
-  if (effectAlpha <= 0.002) discard;
+  // The center receives only a faint mip-filtered copy of the artwork. This
+  // adds a small amount of real optical softness without returning to a heavy
+  // full-card backdrop blur.
+  if (finalAlpha <= 0.002) discard;
 
   float lens = edge * edge * (3.0 - 2.0 * edge);
   vec2 refractedPixel = gl_FragCoord.xy - normal * uRefraction * lens;
 
   vec2 baseUv = coverUv(gl_FragCoord.xy);
-  vec3 baseColor = texture(uBackground, baseUv).rgb;
+  vec3 baseColor = textureLod(uBackground, baseUv, uBlurLod).rgb;
   vec3 color = baseColor;
 
   vec2 dispersionOffset = normal * uDispersion * lens;
-  float red = texture(uBackground, coverUv(refractedPixel + dispersionOffset)).r;
-  float green = texture(uBackground, coverUv(refractedPixel)).g;
-  float blue = texture(uBackground, coverUv(refractedPixel - dispersionOffset)).b;
+  float red = textureLod(uBackground, coverUv(refractedPixel + dispersionOffset), uBlurLod).r;
+  float green = textureLod(uBackground, coverUv(refractedPixel), uBlurLod).g;
+  float blue = textureLod(uBackground, coverUv(refractedPixel - dispersionOffset), uBlurLod).b;
   color = vec3(red, green, blue);
 
   float luminance = dot(baseColor, vec3(0.2126, 0.7152, 0.0722));
@@ -155,7 +163,7 @@ void main() {
   color -= vec3(0.018, 0.010, 0.015) * edge * (1.0 - facingLight) * 0.42;
   color = clamp(color, 0.0, 1.0);
 
-  fragColor = vec4(color, effectAlpha);
+  fragColor = vec4(color, finalAlpha);
 }
 `;
 
@@ -202,7 +210,7 @@ void main() {
 
       const cores = navigator.hardwareConcurrency || 8;
       const memory = navigator.deviceMemory || 8;
-      this.baseRenderScale = cores <= 4 || memory <= 4 ? 0.52 : 0.68;
+      this.baseRenderScale = cores <= 4 || memory <= 4 ? 0.48 : 0.64;
 
       this.onPointerMove = this.onPointerMove.bind(this);
       this.onScroll = this.onScroll.bind(this);
@@ -269,7 +277,7 @@ void main() {
 
       const texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -299,7 +307,9 @@ void main() {
         edgeThickness: gl.getUniformLocation(program, "uEdgeThickness"),
         dispersion: gl.getUniformLocation(program, "uDispersion"),
         tint: gl.getUniformLocation(program, "uTint"),
-        highlight: gl.getUniformLocation(program, "uHighlight")
+        highlight: gl.getUniformLocation(program, "uHighlight"),
+        blurLod: gl.getUniformLocation(program, "uBlurLod"),
+        bodyOpacity: gl.getUniformLocation(program, "uBodyOpacity")
       };
     }
 
@@ -342,6 +352,7 @@ void main() {
       const gl = this.gl;
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+      gl.generateMipmap(gl.TEXTURE_2D);
       this.backgroundSize = [image.naturalWidth, image.naturalHeight];
       this.textureReady = true;
       this.loading = false;
@@ -447,6 +458,8 @@ void main() {
         gl.uniform1f(this.uniforms.dispersion, surface.dispersion * scale);
         gl.uniform1f(this.uniforms.tint, surface.tint);
         gl.uniform1f(this.uniforms.highlight, surface.highlight);
+        gl.uniform1f(this.uniforms.blurLod, surface.blurLod);
+        gl.uniform1f(this.uniforms.bodyOpacity, surface.bodyOpacity);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
 
