@@ -832,7 +832,13 @@ body::after { z-index: 0; }
 .liquid-card .section, .liquid-card .footer { border-color: rgba(255,255,255,.60); }
 .liquid-card .section { background: rgba(255,232,230,.08); }
 @media (max-width: 860px) {
-  body { background-attachment: scroll; }
+  /* Portrait artwork is composed for a phone viewport; leave the desktop scene untouched. */
+  body {
+    background-image: url("assets/pastel-homepage-background-mobile.png");
+    background-position: center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
   .page-shell { padding: 100px 16px 32px; }
   .liquid-card { border-radius: 23px; }
   .floating-nav { top: 14px; width: calc(100% - 32px); }
