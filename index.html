@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>流年</title>
 <meta name="description" content="Liunian's personal homepage — software engineer working in C++ and backend systems.">
+<link rel="preload" as="image" href="assets/pastel-homepage-background.webp" media="(min-width: 861px)" fetchpriority="high">
+<link rel="preload" as="image" href="assets/pastel-homepage-background-mobile.webp" media="(max-width: 860px)" fetchpriority="high">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2311161C'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='28' fill='%23FFFFFF' text-anchor='middle'%3ELN%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -804,7 +806,7 @@ html { background: #f3aaa7; }
 body {
   min-height: 100vh;
   color: #514a50;
-  background: #f3aaa7 url("assets/pastel-homepage-background.png") center / cover fixed no-repeat;
+  background: #f3aaa7 url("assets/pastel-homepage-background.webp") center / cover fixed no-repeat;
 }
 body::before { z-index: 0; background: linear-gradient(180deg, rgba(255,226,220,.10), rgba(237,143,158,.12)); filter: none; opacity: 1; }
 body::after { z-index: 0; }
@@ -834,7 +836,7 @@ body::after { z-index: 0; }
 @media (max-width: 860px) {
   /* Portrait artwork is composed for a phone viewport; leave the desktop scene untouched. */
   body {
-    background-image: url("assets/pastel-homepage-background-mobile.png");
+    background-image: url("assets/pastel-homepage-background-mobile.webp");
     background-position: center top;
     background-size: cover;
     background-attachment: fixed;
