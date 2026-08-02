@@ -42,14 +42,14 @@
     if (element.classList.contains("message-item")) {
       return {
         radius: 13,
-        refraction: 41.5,
+        refraction: 4.5,
         edge: 10,
         dispersion: 0.62,
         tint: 0.048,
         highlight: 0.76,
         // 轻微 mipmap 模糊：只柔化背景细节，不做成厚重磨砂玻璃。
         blurLod: 0.68,
-        bodyOpacity: 0
+        bodyOpacity: 0.08
       };
     }
 
