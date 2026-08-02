@@ -26,30 +26,80 @@
     return;
   }
 
-  const surfaces = [
-    {
-      element: document.querySelector(".liquid-card"),
-      radius: 30,
-      refraction: 11,
-      edge: 26,
-      dispersion: 1.15,
-      tint: 0.105,
-      highlight: 1.0,
-      blurLod: 0.78,
-      bodyOpacity: 0.13
-    },
-    {
-      element: document.querySelector(".floating-nav"),
-      radius: 999,
-      refraction: 8,
-      edge: 18,
-      dispersion: 1.35,
-      tint: 0.08,
-      highlight: 1.16,
-      blurLod: 0.55,
-      bodyOpacity: 0.10
+  const surfaceFor = (element, profile) => ({ element, ...profile });
+  const innerProfileFor = (element) => {
+    if (element.classList.contains("message-item")) {
+      return {
+        radius: 13,
+        refraction: 4.5,
+        edge: 10,
+        dispersion: 0.62,
+        tint: 0.048,
+        highlight: 0.76,
+        blurLod: 0.46,
+        bodyOpacity: 0.065
+      };
     }
-  ].filter((surface) => surface.element);
+
+    const radius = element.classList.contains("hero-terminal") ? 24
+      : element.classList.contains("quote") ? 12
+      : element.matches(".guestbook-form, .message-stream") ? 18
+      : 16;
+
+    return {
+      radius,
+      refraction: element.classList.contains("pet-stage") ? 7.5 : 6.2,
+      edge: element.classList.contains("pet-stage") ? 16 : 14,
+      dispersion: 0.86,
+      tint: 0.064,
+      highlight: element.classList.contains("pet-stage") ? 1.02 : 0.9,
+      blurLod: 0.62,
+      bodyOpacity: 0.085
+    };
+  };
+
+  // Draw from back to front: the large shell, visible inner cards, then the
+  // floating navigation. The same canvas and background texture are reused for
+  // every surface, so adding cards does not add WebGL contexts or image uploads.
+  const collectSurfaces = () => {
+    const items = [];
+    const shell = document.querySelector(".liquid-card");
+    const navigation = document.querySelector(".floating-nav");
+
+    if (shell) {
+      items.push(surfaceFor(shell, {
+        radius: 30,
+        refraction: 11,
+        edge: 26,
+        dispersion: 1.15,
+        tint: 0.105,
+        highlight: 1.0,
+        blurLod: 0.78,
+        bodyOpacity: 0.13
+      }));
+    }
+
+    document.querySelectorAll(".liquid-surface").forEach((element) => {
+      items.push(surfaceFor(element, innerProfileFor(element)));
+    });
+
+    if (navigation) {
+      items.push(surfaceFor(navigation, {
+        radius: 999,
+        refraction: 8,
+        edge: 18,
+        dispersion: 1.35,
+        tint: 0.08,
+        highlight: 1.16,
+        blurLod: 0.55,
+        bodyOpacity: 0.10
+      }));
+    }
+
+    return items;
+  };
+
+  const surfaces = collectSurfaces();
 
   if (!surfaces.length) {
     root.dataset.liquidGlass = "css";
@@ -168,8 +218,10 @@ void main() {
 `;
 
   class LiquidGlassRenderer {
-    constructor(items) {
+    constructor(items, surfaceFactory) {
       this.surfaces = items;
+      this.surfaceFactory = surfaceFactory;
+      this.visibleElements = new Set(items.map((surface) => surface.element));
       this.canvas = document.createElement("canvas");
       this.canvas.id = "liquid-glass-webgl";
       this.canvas.setAttribute("aria-hidden", "true");
@@ -204,7 +256,6 @@ void main() {
       this.lastFrameTime = 0;
       this.minimumFrameInterval = 1000 / 30;
       this.needsResize = true;
-      this.middleScrollStable = false;
       this.pointerX = window.innerWidth * 0.5;
       this.pointerY = window.innerHeight * 0.15;
 
@@ -219,6 +270,7 @@ void main() {
       this.onMediaChange = this.onMediaChange.bind(this);
       this.onContextLost = this.onContextLost.bind(this);
       this.onContextRestored = this.onContextRestored.bind(this);
+      this.onMutations = this.onMutations.bind(this);
       this.tick = this.tick.bind(this);
 
       this.canvas.addEventListener("webglcontextlost", this.onContextLost, false);
@@ -325,6 +377,62 @@ void main() {
         this.resizeObserver = new ResizeObserver(() => this.requestRender());
         this.surfaces.forEach((surface) => this.resizeObserver.observe(surface.element));
       }
+
+      if ("IntersectionObserver" in window) {
+        this.intersectionObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) this.visibleElements.add(entry.target);
+            else this.visibleElements.delete(entry.target);
+          });
+          this.canvas.dataset.visibleSurfaceCount = String(this.visibleElements.size);
+          this.requestRender();
+        }, { rootMargin: "56px 0px" });
+        this.surfaces.forEach((surface) => this.intersectionObserver.observe(surface.element));
+      }
+
+      const card = document.querySelector(".liquid-card");
+      if (card && "MutationObserver" in window) {
+        this.mutationObserver = new MutationObserver(this.onMutations);
+        this.mutationObserver.observe(card, { childList: true, subtree: true });
+      }
+    }
+
+    onMutations(mutations) {
+      const containsSurface = (node) =>
+        node.nodeType === Node.ELEMENT_NODE
+        && (node.matches(".liquid-surface") || node.querySelector(".liquid-surface"));
+      const hasCardChanges = mutations.some((mutation) =>
+        [...mutation.addedNodes, ...mutation.removedNodes].some((node) =>
+          containsSurface(node)
+        )
+      );
+      if (hasCardChanges) this.refreshSurfaces();
+    }
+
+    refreshSurfaces() {
+      if (this.destroyed || !this.surfaceFactory) return;
+      const previousElements = new Set(this.surfaces.map((surface) => surface.element));
+      const nextSurfaces = this.surfaceFactory();
+      const nextElements = new Set(nextSurfaces.map((surface) => surface.element));
+
+      previousElements.forEach((element) => {
+        if (nextElements.has(element)) return;
+        if (this.resizeObserver) this.resizeObserver.unobserve(element);
+        if (this.intersectionObserver) this.intersectionObserver.unobserve(element);
+        this.visibleElements.delete(element);
+      });
+
+      nextSurfaces.forEach((surface) => {
+        if (previousElements.has(surface.element)) return;
+        this.visibleElements.add(surface.element);
+        if (this.resizeObserver) this.resizeObserver.observe(surface.element);
+        if (this.intersectionObserver) this.intersectionObserver.observe(surface.element);
+      });
+
+      this.surfaces = nextSurfaces;
+      this.canvas.dataset.surfaceCount = String(nextSurfaces.length);
+      this.canvas.dataset.visibleSurfaceCount = String(this.visibleElements.size);
+      this.requestRender();
     }
 
     async loadBackground() {
@@ -360,6 +468,8 @@ void main() {
       root.classList.toggle("webgl-liquid-ready", shouldShow);
       root.dataset.liquidGlass = shouldShow ? "webgl" : "css";
       this.canvas.dataset.renderScale = String(this.baseRenderScale);
+      this.canvas.dataset.surfaceCount = String(this.surfaces.length);
+      this.canvas.dataset.visibleSurfaceCount = String(this.visibleElements.size);
       if (shouldShow) this.requestRender(true);
     }
 
@@ -433,6 +543,7 @@ void main() {
       );
 
       for (const surface of this.surfaces) {
+        if (this.intersectionObserver && !this.visibleElements.has(surface.element)) continue;
         const rect = surface.element.getBoundingClientRect();
         if (
           rect.width <= 0 ||
@@ -473,22 +584,6 @@ void main() {
     }
 
     onScroll() {
-      const cardSurface = this.surfaces.find((surface) =>
-        surface.element.classList.contains("liquid-card")
-      );
-      if (cardSurface) {
-        const rect = cardSurface.element.getBoundingClientRect();
-        const stableMiddle = rect.top <= -cardSurface.edge
-          && rect.bottom >= window.innerHeight + cardSurface.edge;
-        if (stableMiddle) {
-          if (!this.middleScrollStable) {
-            this.middleScrollStable = true;
-            this.requestRender();
-          }
-          return;
-        }
-      }
-      this.middleScrollStable = false;
       this.requestRender();
     }
 
@@ -550,6 +645,9 @@ void main() {
       removeMediaListener(desktopGlass, this.onMediaChange);
       removeMediaListener(reducedMotion, this.onMediaChange);
       if (this.resizeObserver) this.resizeObserver.disconnect();
+      if (this.intersectionObserver) this.intersectionObserver.disconnect();
+      if (this.mutationObserver) this.mutationObserver.disconnect();
+      this.visibleElements.clear();
 
       this.canvas.removeEventListener("webglcontextlost", this.onContextLost);
       this.canvas.removeEventListener("webglcontextrestored", this.onContextRestored);
@@ -569,7 +667,7 @@ void main() {
   }
 
   try {
-    const renderer = new LiquidGlassRenderer(surfaces);
+    const renderer = new LiquidGlassRenderer(surfaces, collectSurfaces);
     window.liquidGlassRenderer = renderer;
     renderer.loadBackground().catch(() => renderer.fallback());
   } catch (_error) {
