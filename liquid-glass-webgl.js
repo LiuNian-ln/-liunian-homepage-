@@ -26,18 +26,30 @@
     return;
   }
 
+  /*
+   * 液态玻璃效果参数说明：
+   * radius：玻璃圆角半径，决定边缘的连续曲率。
+   * refraction：背景在玻璃边缘的位移量，形成水滴般折射。
+   * edge：参与折射与高光的边缘宽度，数值越大玻璃越厚。
+   * dispersion：红绿蓝采样的细微错位量，模拟色散。
+   * tint：从当前背景取色后混入玻璃的环境染色强度。
+   * highlight：跟随指针与背景亮度变化的边缘高光强度。
+   * blurLod：mipmap 采样层级，只轻微柔化玻璃后的背景细节。
+   * bodyOpacity：柔化背景在玻璃中心的混合比例，控制整体透明度。
+   */
   const surfaceFor = (element, profile) => ({ element, ...profile });
   const innerProfileFor = (element) => {
     if (element.classList.contains("message-item")) {
       return {
         radius: 13,
-        refraction: 4.5,
+        refraction: 41.5,
         edge: 10,
         dispersion: 0.62,
         tint: 0.048,
         highlight: 0.76,
-        blurLod: 0.46,
-        bodyOpacity: 0.065
+        // 轻微 mipmap 模糊：只柔化背景细节，不做成厚重磨砂玻璃。
+        blurLod: 0.68,
+        bodyOpacity: 0
       };
     }
 
@@ -53,8 +65,9 @@
       dispersion: 0.86,
       tint: 0.064,
       highlight: element.classList.contains("pet-stage") ? 1.02 : 0.9,
-      blurLod: 0.62,
-      bodyOpacity: 0.085
+      // 轻微 mipmap 模糊：保留背景颜色、光影和可辨识的画面内容。
+      blurLod: 0.90,
+      bodyOpacity: 0.11
     };
   };
 
@@ -379,6 +392,7 @@ void main() {
       }
 
       if ("IntersectionObserver" in window) {
+        // 视口裁剪：只绘制屏幕附近的玻璃表面，避免长页面持续全量渲染。
         this.intersectionObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) this.visibleElements.add(entry.target);
@@ -392,6 +406,7 @@ void main() {
 
       const card = document.querySelector(".liquid-card");
       if (card && "MutationObserver" in window) {
+        // 动态卡片同步：留言加载或刷新后自动加入同一套玻璃效果。
         this.mutationObserver = new MutationObserver(this.onMutations);
         this.mutationObserver.observe(card, { childList: true, subtree: true });
       }

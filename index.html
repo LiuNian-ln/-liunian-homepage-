@@ -866,6 +866,7 @@ html.webgl-liquid-ready #liquid-glass-webgl { opacity: 1; }
 .floating-nav .nav-links a:hover { color: #ed4e82; }
 .floating-nav .aqua { color: #514a50; -webkit-backdrop-filter: none; backdrop-filter: none; }
 .liquid-card .hero { padding-top: 84px; }
+/* 玻璃主体：低透明环境染色与柔和厚度阴影。 */
 .liquid-card .liquid-surface {
   position: relative;
   isolation: isolate;
@@ -882,6 +883,7 @@ html.webgl-liquid-ready #liquid-glass-webgl { opacity: 1; }
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+/* 外层反光：根据局部光源位置形成柔和环境高光。 */
 .liquid-card .liquid-surface:not(.pet-stage)::before {
   content: "";
   position: absolute;
@@ -894,6 +896,7 @@ html.webgl-liquid-ready #liquid-glass-webgl { opacity: 1; }
     radial-gradient(ellipse 55% 80% at var(--glass-local-x, 22%) var(--glass-local-y, 12%), rgba(255,255,255,.17), transparent 72%);
   opacity: .72;
 }
+/* 内层亮边：与外边框组合，表现几毫米玻璃厚度。 */
 .liquid-card .liquid-surface:not(.pet-stage)::after {
   content: "";
   position: absolute;
@@ -922,6 +925,7 @@ html.webgl-liquid-ready .liquid-card {
 }
 html.webgl-liquid-ready .liquid-card::before { opacity: .30; }
 html.webgl-liquid-ready .liquid-card::after { opacity: .30; }
+/* WebGL 就绪后降低 CSS 覆盖，让折射后的真实背景透出来。 */
 html.webgl-liquid-ready .liquid-card .liquid-surface {
   background:
     radial-gradient(ellipse 78% 64% at var(--glass-local-x, 28%) var(--glass-local-y, 18%), rgba(255,255,255,.12), transparent 70%),
@@ -935,12 +939,14 @@ html.webgl-liquid-ready .liquid-card .liquid-surface {
 }
 html.webgl-liquid-ready .liquid-card .liquid-surface:not(.pet-stage)::before { opacity: .46; }
 html.webgl-liquid-ready .liquid-card .liquid-surface:not(.pet-stage)::after { border-color: rgba(255,255,255,.22); }
+/* 宠物舞台保留少量粉蓝环境染色，同时露出 WebGL 折射。 */
 html.webgl-liquid-ready .liquid-card .pet-stage {
   background:
     radial-gradient(circle at 35% 28%, rgba(255,255,255,.20), transparent 38%),
     radial-gradient(circle at 66% 72%, rgba(158,177,255,.10), transparent 36%),
     linear-gradient(145deg, rgba(255,255,255,.11), rgba(255,235,246,.055));
 }
+/* 留言小卡片使用更轻的染色，避免多层玻璃叠加过白。 */
 html.webgl-liquid-ready .liquid-card .message-item {
   background: linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,226,234,.045));
 }
